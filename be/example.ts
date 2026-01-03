@@ -14,6 +14,11 @@ table.startHand();
 
 while (table.isHandInProgress()) {
     while (table.isBettingRoundInProgress()) {
+        for (const s of table.seats()) {
+            if (!s) continue;
+            console.log(JSON.stringify(s, null, 2));
+        }
+
         const seatIndex = table.playerToAct();
         console.log(`\n> Player at seat ${seatIndex} to act.`);
 
@@ -77,3 +82,4 @@ while (table.isHandInProgress()) {
 }
 
 console.log(JSON.stringify(table.winners(), null, 2));
+

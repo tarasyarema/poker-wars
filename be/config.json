@@ -1,0 +1,18 @@
+{
+  "initialChips": 500,
+  "blindStructure": [
+    { "smallBlind": 10, "bigBlind": 20, "handsUntilIncrease": 5 },
+    { "smallBlind": 25, "bigBlind": 50, "handsUntilIncrease": 5 },
+    { "smallBlind": 50, "bigBlind": 100, "handsUntilIncrease": 5 },
+    { "smallBlind": 100, "bigBlind": 200, "handsUntilIncrease": 5 },
+    { "smallBlind": 200, "bigBlind": 400, "handsUntilIncrease": 5 }
+  ],
+  "players": [
+    { "index": 0, "model": "xai/grok-code-fast-1" },
+    { "index": 1, "model": "google/gemini-3-flash" },
+    { "index": 2, "model": "anthropic/claude-haiku-4.5" },
+    { "index": 3, "model": "minimax/minimax-m2" },
+    { "index": 4, "model": "openai/gpt-5-mini" },
+    { "index": 5, "model": "deepseek/deepseek-v3.2" }
+  ]
+}
