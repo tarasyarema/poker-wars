@@ -53,12 +53,12 @@ export function Board({ currentHand, players, buttonPosition, chipLeaderIndex }:
         background: 'radial-gradient(ellipse at center, rgba(13, 92, 46, 0.3) 0%, var(--color-bg-dark) 70%)',
       }}
     >
-      {/* Poker table - centered, larger for full screen */}
+      {/* Poker table - centered, responsive sizing */}
       <div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-2 rounded-[50%]"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-1 sm:p-2 rounded-[50%]"
         style={{
-          width: 'clamp(400px, 60vw, 900px)',
-          height: 'clamp(200px, 40vh, 500px)',
+          width: 'clamp(280px, 85vw, 900px)',
+          height: 'clamp(160px, 45vh, 500px)',
           background: 'linear-gradient(180deg, #3d2817 0%, #2a1a0f 50%, #1a0f08 100%)',
         }}
       >
@@ -75,30 +75,30 @@ export function Board({ currentHand, players, buttonPosition, chipLeaderIndex }:
           }}
         >
           {/* Watermark */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 font-pixel text-[48px] text-nes-yellow/10 pointer-events-none select-none">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 font-pixel text-[28px] sm:text-[36px] md:text-[48px] text-nes-yellow/10 pointer-events-none select-none">
             PW
           </div>
         </div>
       </div>
 
       {/* Center area - cards and pot */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-2 z-10">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-1 sm:gap-2 z-10">
         {currentHand ? (
           <>
             <CommunityCards cards={currentHand.communityCards} />
             <Pot pots={currentHand.pots} />
-            <div className="flex flex-col items-center gap-0.5 py-1 px-3 bg-bg-dark border-[3px] border-nes-blue">
-              <span className="font-pixel text-[7px] text-nes-gray tracking-[2px]">ROUND</span>
-              <span className="font-pixel text-[10px] text-nes-blue tracking-[1px]">{currentHand.round.toUpperCase()}</span>
+            <div className="flex flex-col items-center gap-0.5 py-0.5 sm:py-1 px-2 sm:px-3 bg-bg-dark border-2 sm:border-[3px] border-nes-blue">
+              <span className="font-pixel text-[6px] sm:text-[7px] text-nes-gray tracking-[1px] sm:tracking-[2px]">ROUND</span>
+              <span className="font-pixel text-[8px] sm:text-[10px] text-nes-blue tracking-[1px]">{currentHand.round.toUpperCase()}</span>
             </div>
           </>
         ) : (
-          <div className="flex flex-col items-center gap-2 p-4">
-            <span className="font-pixel text-[10px] text-nes-gray tracking-[2px]">WAITING FOR HAND</span>
+          <div className="flex flex-col items-center gap-2 p-2 sm:p-4">
+            <span className="font-pixel text-[8px] sm:text-[10px] text-nes-gray tracking-[1px] sm:tracking-[2px]">WAITING FOR HAND</span>
             <div className="flex gap-2">
-              <span className="text-[14px] text-nes-pink animate-pulse" style={{ animationDelay: '0s' }}>●</span>
-              <span className="text-[14px] text-nes-pink animate-pulse" style={{ animationDelay: '0.3s' }}>●</span>
-              <span className="text-[14px] text-nes-pink animate-pulse" style={{ animationDelay: '0.6s' }}>●</span>
+              <span className="text-[12px] sm:text-[14px] text-nes-pink animate-pulse" style={{ animationDelay: '0s' }}>●</span>
+              <span className="text-[12px] sm:text-[14px] text-nes-pink animate-pulse" style={{ animationDelay: '0.3s' }}>●</span>
+              <span className="text-[12px] sm:text-[14px] text-nes-pink animate-pulse" style={{ animationDelay: '0.6s' }}>●</span>
             </div>
           </div>
         )}

@@ -8,6 +8,8 @@ interface LogsProps {
   hands: HandSummary[];
   players: Player[];
   currentHandNumber: number | null;
+  isDrawer?: boolean;
+  onClose?: () => void;
 }
 
 // Threshold in pixels to consider "at bottom"
@@ -89,7 +91,7 @@ function groupReasoningEvents(logs: LogEvent[]): DisplayLogEvent[] {
   return result;
 }
 
-export function Logs({ logs, connected, hands, players, currentHandNumber: propHandNumber }: LogsProps) {
+export function Logs({ logs, connected, hands, players, currentHandNumber: propHandNumber, isDrawer, onClose }: LogsProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isAtBottom, setIsAtBottom] = useState(true);
   const [selectedHand, setSelectedHand] = useState<number | 'live'>('live');
@@ -159,6 +161,15 @@ export function Logs({ logs, connected, hands, players, currentHandNumber: propH
       {/* Header */}
       <div className="p-4 border-b-[3px] border-nes-green flex items-center justify-between relative z-10">
         <div className="flex items-center gap-3">
+          {isDrawer && onClose && (
+            <button
+              onClick={onClose}
+              className="font-pixel text-[16px] text-nes-gray hover:text-nes-white transition-colors mr-1"
+              aria-label="Close"
+            >
+              &#10005;
+            </button>
+          )}
           <span className="font-pixel text-[8px] text-nes-gray tracking-[1px]">CHAT</span>
           <select
             value={selectedHand}

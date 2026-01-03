@@ -2,8 +2,10 @@ import { useState, useCallback, useEffect, useMemo } from 'react';
 import { useGameState } from './hooks/useGameState';
 import { useLogStream } from './hooks/useLogStream';
 import { useGamesList } from './hooks/useGamesList';
+import { useResponsive } from './hooks/useResponsive';
 import { Board } from './components/Board/Board';
 import { Logs } from './components/Logs/Logs';
+import { MobileDrawer } from './components/MobileDrawer';
 import { WinnerModal } from './components/WinnerModal';
 import { GamesListModal } from './components/GamesListModal';
 import { API_URL } from './utils/api';
@@ -13,6 +15,7 @@ function App() {
   const { gameState, loading, error, refetch } = useGameState(500);
   const { logs, connected, clearLogs } = useLogStream();
   const { games, loading: gamesLoading, error: gamesError, fetchGames } = useGamesList();
+  const { sidebarOpen, toggleSidebar, closeSidebar } = useResponsive();
   const [isStarting, setIsStarting] = useState(false);
   const [startError, setStartError] = useState<string | null>(null);
   const [showWinnerModal, setShowWinnerModal] = useState(false);
@@ -171,9 +174,9 @@ function App() {
   return (
     <div className="h-screen w-screen bg-bg-dark overflow-hidden relative">
       {/* Compact Header - overlaid at top */}
-      <header className="fixed top-0 left-0 right-80 lg:right-96 h-12 bg-bg-dark/90 backdrop-blur z-40 flex items-center justify-between px-4 border-b-[3px] border-border">
-        {/* Left: Hand info */}
-        <div className="flex items-center gap-4">
+      <header className="fixed top-0 left-0 right-0 lg:right-80 xl:right-96 h-12 bg-bg-dark/90 backdrop-blur z-40 flex items-center justify-between px-4 border-b-[3px] border-border">
+        {/* Left: Hand info (hidden on mobile) */}
+        <div className="hidden sm:flex items-center gap-4">
           {gameState?.game.status === 'in_progress' && currentHandNumber != null && (
             <div className="flex items-center gap-2">
               <span className="font-pixel text-[10px] text-nes-gray">HAND</span>
@@ -190,16 +193,23 @@ function App() {
           )}
         </div>
 
-        {/* Center: Logo */}
-        <div className="flex items-center gap-2">
-          <span className="font-pixel text-lg text-nes-pink">POKER</span>
-          <span className="font-pixel text-lg text-nes-yellow">WARS</span>
+        {/* Mobile: Hand # only */}
+        <div className="flex sm:hidden items-center">
+          {gameState?.game.status === 'in_progress' && currentHandNumber != null && (
+            <span className="font-pixel text-[10px] text-nes-pink">#{currentHandNumber}</span>
+          )}
         </div>
 
-        {/* Right: Chip leader */}
+        {/* Center: Logo */}
+        <div className="flex items-center gap-2">
+          <span className="font-pixel text-sm sm:text-lg text-nes-pink">POKER</span>
+          <span className="font-pixel text-sm sm:text-lg text-nes-yellow">WARS</span>
+        </div>
+
+        {/* Right: Chip leader (hidden on mobile) + sidebar toggle */}
         <div className="flex items-center gap-2">
           {chipLeader && (
-            <>
+            <div className="hidden md:flex items-center gap-2">
               <span className="font-pixel text-[10px] text-nes-gray">LEADER</span>
               <span className="font-pixel text-sm text-rank-gold">
                 {getShortModelName(chipLeader.model)}
@@ -208,14 +218,22 @@ function App() {
               <span className="font-pixel text-sm text-rank-gold">
                 {chipLeader.stack.toLocaleString()}
               </span>
-            </>
+            </div>
           )}
+          {/* Sidebar toggle button - mobile/tablet only */}
+          <button
+            onClick={toggleSidebar}
+            className="lg:hidden font-pixel text-[10px] px-2 py-1 border-2 border-nes-green text-nes-green hover:bg-nes-green hover:text-bg-dark transition-colors"
+            aria-label="Toggle chat"
+          >
+            CHAT
+          </button>
         </div>
       </header>
 
-      {/* Leaderboard - floating top left */}
+      {/* Leaderboard - floating top left (hidden on mobile/small tablets) */}
       {gameState?.game.players && gameState.game.players.length > 0 && (
-        <div className="fixed top-14 left-4 z-30 bg-bg-panel/95 backdrop-blur border-[3px] border-border p-2 min-w-[140px]">
+        <div className="hidden md:block fixed top-14 left-4 z-30 bg-bg-panel/95 backdrop-blur border-[3px] border-border p-2 min-w-[140px]">
           <div className="font-pixel text-[8px] text-nes-gray tracking-[1px] mb-2 pb-1 border-b border-border">
             LEADERBOARD
           </div>
@@ -265,7 +283,7 @@ function App() {
       )}
 
       {/* Full-screen poker table area */}
-      <main className="w-full h-full pt-12 pb-10 pr-80 lg:pr-96">
+      <main className="w-full h-full pt-12 pb-10 pr-0 lg:pr-80 xl:pr-96">
         <Board
           currentHand={gameState?.currentHand || null}
           players={gameState?.game.players || []}
@@ -274,19 +292,32 @@ function App() {
         />
       </main>
 
-      {/* Floating AI thoughts sidebar - right side */}
-      <aside className="fixed right-0 top-0 h-full w-80 lg:w-96 bg-bg-panel/95 backdrop-blur border-l-[3px] border-nes-green flex flex-col z-50">
+      {/* Desktop sidebar - fixed right */}
+      <aside className="hidden lg:flex fixed right-0 top-0 h-full w-80 xl:w-96 bg-bg-panel/95 backdrop-blur border-l-[3px] border-nes-green flex-col z-50">
         <Logs
-            logs={logs}
-            connected={connected}
-            hands={gameState?.hands || []}
-            players={gameState?.game.players || []}
-            currentHandNumber={currentHandNumber}
-          />
+          logs={logs}
+          connected={connected}
+          hands={gameState?.hands || []}
+          players={gameState?.game.players || []}
+          currentHandNumber={currentHandNumber}
+        />
       </aside>
 
+      {/* Mobile/Tablet drawer */}
+      <MobileDrawer isOpen={sidebarOpen} onClose={closeSidebar}>
+        <Logs
+          logs={logs}
+          connected={connected}
+          hands={gameState?.hands || []}
+          players={gameState?.game.players || []}
+          currentHandNumber={currentHandNumber}
+          isDrawer
+          onClose={closeSidebar}
+        />
+      </MobileDrawer>
+
       {/* Footer bar */}
-      <footer className="fixed bottom-0 left-0 right-80 lg:right-96 h-10 bg-bg-dark/90 backdrop-blur z-40 flex items-center justify-between px-4 border-t-[3px] border-border">
+      <footer className="fixed bottom-0 left-0 right-0 lg:right-80 xl:right-96 h-10 bg-bg-dark/90 backdrop-blur z-40 flex items-center justify-between px-2 sm:px-4 border-t-[3px] border-border">
         {/* Status */}
         <div className="flex items-center gap-2">
           <span
@@ -298,17 +329,24 @@ function App() {
                   : 'bg-nes-orange'
             }`}
           />
-          <span className="font-pixel text-[10px] text-nes-gray tracking-[1px]">
+          <span className="font-pixel text-[8px] sm:text-[10px] text-nes-gray tracking-[1px]">
             {gameState?.game.status === 'in_progress'
-              ? 'GAME IN PROGRESS'
+              ? 'LIVE'
               : gameState?.game.status === 'completed'
-                ? 'GAME COMPLETE'
-                : 'WAITING...'}
+                ? 'DONE'
+                : 'WAIT'}
+          </span>
+          <span className="hidden sm:inline font-pixel text-[10px] text-nes-gray tracking-[1px]">
+            {gameState?.game.status === 'in_progress'
+              ? '- GAME IN PROGRESS'
+              : gameState?.game.status === 'completed'
+                ? '- GAME COMPLETE'
+                : '...'}
           </span>
         </div>
 
-        {/* Winner announcement or tagline */}
-        <div className="flex items-center gap-2">
+        {/* Winner announcement or tagline (hidden on mobile) */}
+        <div className="hidden sm:flex items-center gap-2">
           {winner ? (
             <>
               <span className="text-rank-gold">&#9812;</span>
@@ -327,14 +365,14 @@ function App() {
         </div>
 
         {/* History button and Version */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <button
             onClick={() => setShowGamesModal(true)}
-            className="font-pixel text-[8px] px-3 py-1 bg-bg-dark border-[2px] border-nes-cyan text-nes-cyan hover:bg-nes-cyan hover:text-bg-dark transition-colors tracking-[1px]"
+            className="font-pixel text-[8px] px-2 sm:px-3 py-1 bg-bg-dark border-[2px] border-nes-cyan text-nes-cyan hover:bg-nes-cyan hover:text-bg-dark transition-colors tracking-[1px]"
           >
             HISTORY
           </button>
-          <span className="text-nes-red">&#9829;</span>
+          <span className="hidden sm:inline text-nes-red">&#9829;</span>
           <span className="font-pixel text-[8px] text-nes-gray">v1.0</span>
         </div>
       </footer>
